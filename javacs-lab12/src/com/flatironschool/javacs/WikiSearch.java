@@ -60,8 +60,28 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch or(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+        //sum the relavance numbers of both words
+        
+        //create a new map to use for the WikiSearch Object
+        Map<String, Integer> set = new HashMap<String, Integer>();
+        
+        //go through current map and add the relevance score
+        for(String word: map.keySet()){
+            set.put(word, this.getRelevance(word));
+        }
+        
+        //go through given "that"s map and add the relavance score if the word already exists
+        for(String word: that.map.keySet()){
+            if(set.containsKey(word)){
+                set.put(word, this.getRelevance(word) + that.getRelevance(word));
+            }else{
+                set.put(word, that.getRelevance(word));
+            }
+        }
+        
+        //return the WikiSearch containing the updated relevance scores
+        return new WikiSearch(set);
+        
 	}
 	
 	/**
@@ -71,8 +91,17 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch and(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+        //create a new map to use for the WikiSearch Object
+        Map<String, Integer> set = new HashMap<String, Integer>();
+        
+        //add the relevance scores of existing words
+        for(String word: map.keySet()){
+            if(that.map.containsKey(word)){
+                set.put(word, this.getRelevance(word) + that.getRelevance(word));
+            }
+        }
+        
+        return new WikiSearch(set);
 	}
 	
 	/**
@@ -82,8 +111,17 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch minus(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+        //create a new map to use for the WikiSearch Object
+        Map<String, Integer> set = new HashMap<String, Integer>();
+        
+        //only add the score if the map doesn't contain the word
+        for(String word: map.keySet()){
+            if(!that.map.containsKey(word)){
+                set.put(word, this.getRelevance(word));
+            }
+        }
+        
+        return new WikiSearch(set);
 	}
 	
 	/**
@@ -104,9 +142,23 @@ public class WikiSearch {
 	 * @return List of entries with URL and relevance.
 	 */
 	public List<Entry<String, Integer>> sort() {
-        // FILL THIS IN!
-		return null;
+        List<Entry<String, Integer>> list = new LinkedList<Entry<String, Integer>>();
+
+        for(Map.Entry<String, Integer> entry: map.entrySet()){
+            list.add(entry);
+        }
+        
+        Collections.sort(list, comparator);
+        
+        return list;
 	}
+    
+    Comparator<Entry<String, Integer>> comparator = new Comparator<Entry<String, Integer>>() {
+        @Override
+        public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2){
+            return e1.getValue().compareTo(e2.getValue());
+        }
+    };
 
 	/**
 	 * Performs a search and makes a WikiSearch object.
